@@ -36,9 +36,9 @@ A modern, user-friendly expense tracking application built with React and Fireba
 ## Prerequisites
 
 Before you begin, ensure you have the following installed:
-- Node.js (v14 or higher)
-- npm or yarn
-- Git
+- Node.js (v18 or higher)
+- npm
+- Firebase account
 
 ## Getting Started
 
@@ -154,7 +154,7 @@ This project uses GitHub Actions for continuous integration. The CI pipeline:
 - Builds the application
 - Uploads build artifacts
 
-The workflow runs on Node.js versions 16.x and 18.x to ensure compatibility.
+The workflow runs on Node.js versions 18.x and 20.x to ensure compatibility.
 
 ### CI Environment Variables
 
