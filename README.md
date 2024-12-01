@@ -72,6 +72,34 @@ Before you begin, ensure you have the following installed:
    npm run build
    ```
 
+## Testing
+
+The project uses Jest and React Testing Library for testing. The test files are located in the `tests` directory.
+
+### Running Tests
+
+- Run all tests:
+```bash
+npm test
+```
+
+- Run tests in watch mode (for development):
+```bash
+npm run test:watch
+```
+
+- Generate test coverage report:
+```bash
+npm run test:coverage
+```
+
+### Test Structure
+
+- `/tests/components/` - Component tests
+  - `/auth/` - Authentication component tests
+  - `/shared/` - Shared component tests (Button, Input, etc.)
+- `/tests/setupTests.js` - Test setup and configuration
+
 ## Project Structure
 
 ```
