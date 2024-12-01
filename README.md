@@ -2,6 +2,8 @@
 
 A modern, user-friendly expense tracking application built with React and Firebase. Track your personal finances with ease, visualize spending patterns, and manage your budget effectively.
 
+[![CI](https://github.com/[username]/expense-dashboard/actions/workflows/ci.yml/badge.svg)](https://github.com/[username]/expense-dashboard/actions/workflows/ci.yml)
+
 ## Features
 
 - 🔐 Secure Authentication
@@ -142,6 +144,34 @@ VITE_FIREBASE_STORAGE_BUCKET=
 VITE_FIREBASE_MESSAGING_SENDER_ID=
 VITE_FIREBASE_APP_ID=
 ```
+
+## Continuous Integration
+
+This project uses GitHub Actions for continuous integration. The CI pipeline:
+
+- Runs on every push and pull request to main/master branches
+- Tests the codebase using Jest
+- Builds the application
+- Uploads build artifacts
+
+The workflow runs on Node.js versions 16.x and 18.x to ensure compatibility.
+
+### CI Environment Variables
+
+The following secrets need to be set in your GitHub repository settings:
+
+- `FIREBASE_API_KEY`
+- `FIREBASE_AUTH_DOMAIN`
+- `FIREBASE_PROJECT_ID`
+- `FIREBASE_STORAGE_BUCKET`
+- `FIREBASE_MESSAGING_SENDER_ID`
+- `FIREBASE_APP_ID`
+
+To set up these secrets:
+1. Go to your GitHub repository
+2. Navigate to Settings > Secrets and variables > Actions
+3. Click "New repository secret"
+4. Add each Firebase configuration value
 
 ## Available Scripts
 
