@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import PropTypes from 'prop-types'
 
 const ExpenseForm = ({ onAddExpense }) => {
   const [formData, setFormData] = useState({
@@ -132,6 +133,10 @@ const ExpenseForm = ({ onAddExpense }) => {
       </form>
     </div>
   )
+}
+
+ExpenseForm.propTypes = {
+  onAddExpense: PropTypes.func.isRequired
 }
 
 export default ExpenseForm
