@@ -1,47 +1,34 @@
 # Expense Dashboard
 
-A modern, user-friendly expense tracking application built with React, Firebase, and Supabase. Track your personal finances with ease, visualize spending patterns, and manage your budget effectively.
+A modern expense tracking application with multi-currency support, built with React, Firebase Authentication, and Supabase.
 
-[![CI](https://github.com/[username]/expense-dashboard/actions/workflows/ci.yml/badge.svg)](https://github.com/[username]/expense-dashboard/actions/workflows/ci.yml)
+## 🌟 Features
 
-## Features
+- 💰 Multi-currency expense tracking
+- 🔄 Real-time currency conversion
+- 📊 Visual expense statistics
+- 🗂️ Category-based organization
+- 🔐 Secure authentication with Firebase
+- 📱 Responsive design
+- ⚡ Real-time updates with Supabase
 
-- 🔐 Secure Authentication
-  - Email/Password login
-  - Google Sign-in
-  - Password reset functionality
-  - Protected routes
+## 🛠️ Tech Stack
 
-- 💰 Expense Management
-  - Track expenses in multiple currencies
-  - Categorize transactions
-  - Add, edit, and delete expenses
-  - View spending history
-
-- 📊 Analytics
-  - Visual expense breakdowns
-  - Monthly spending trends
-  - Category-wise analysis
-  - Budget tracking
-
-## Tech Stack
-
-- **Frontend Framework**: React with Vite
-- **Styling**: Tailwind CSS
+- **Frontend**: React + Vite
 - **Authentication**: Firebase Auth
-- **Database**: Firebase Firestore and Supabase
+- **Database**: Supabase
+- **Styling**: Tailwind CSS
 - **State Management**: React Hooks
-- **Build Tool**: Vite
+- **Type Checking**: PropTypes
 
-## Prerequisites
+## 📦 Prerequisites
 
-Before you begin, ensure you have the following installed:
-- Node.js (v18 or higher)
-- npm
+- Node.js (v14 or higher)
+- npm or yarn
 - Firebase account
 - Supabase account
 
-## Getting Started
+## 🚀 Getting Started
 
 1. **Clone the repository**
    ```bash
@@ -56,7 +43,6 @@ Before you begin, ensure you have the following installed:
 
 3. **Set up environment variables**
    Create a `.env` file in the root directory with the following variables:
-
    ```env
    # Firebase Configuration
    VITE_FIREBASE_API_KEY=your_firebase_api_key
@@ -67,36 +53,92 @@ Before you begin, ensure you have the following installed:
    VITE_FIREBASE_APP_ID=your_firebase_app_id
 
    # Supabase Configuration
-   VITE_SUPABASE_URL=your_supabase_project_url
+   VITE_SUPABASE_URL=your_supabase_url
    VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
    ```
 
-   To get these values:
+4. **Set up Supabase Database**
+   Run the following SQL in your Supabase SQL editor:
+   ```sql
+   -- Create expenses table
+   CREATE TABLE IF NOT EXISTS expenses (
+       id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+       description TEXT NOT NULL,
+       amount DECIMAL(10,2) NOT NULL,
+       currency TEXT NOT NULL,
+       category TEXT NOT NULL,
+       date DATE NOT NULL,
+       created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL
+   );
 
-   1. **Firebase Configuration**:
-      - Create a project at [Firebase Console](https://console.firebase.google.com/)
-      - Go to Project Settings > General
-      - Scroll down to "Your apps" and create a web app
-      - Copy the configuration values
+   -- Enable Row Level Security
+   ALTER TABLE expenses ENABLE ROW LEVEL SECURITY;
 
-   2. **Supabase Configuration**:
-      - Create a project at [Supabase](https://supabase.com)
-      - Go to Project Settings > API
-      - Copy the Project URL and anon/public key
+   -- Create a policy that allows all operations
+   CREATE POLICY "Enable all operations for all users" ON expenses
+       FOR ALL
+       USING (true)
+       WITH CHECK (true);
+   ```
 
-   ⚠️ **Important**: Never commit the `.env` file to version control. It's already included in `.gitignore`.
-
-4. **Start the development server**
+5. **Start the development server**
    ```bash
    npm run dev
    ```
 
-5. **Build for production**
-   ```bash
-   npm run build
-   ```
+## 🎯 Features in Detail
 
-## Testing
+### Expense Management
+- Add expenses in multiple currencies
+- Delete expenses
+- Categorize expenses
+- Date-based tracking
+
+### Statistics Dashboard
+- Total expenses with currency conversion
+- Highest expense tracking
+- Category-wise breakdown
+- Latest expense tracking
+
+### Currency Support
+- Multiple currency options
+- Real-time currency conversion
+- Persistent currency selection
+
+## 🔒 Security
+
+- Firebase Authentication for secure user management
+- Supabase Row Level Security (RLS) for data protection
+- Environment variables for sensitive configuration
+
+## 🚧 Known Limitations
+
+- Exchange rates are currently hardcoded (future update will integrate a real-time exchange rate API)
+- Basic error handling (will be enhanced in future updates)
+
+## 🔜 Upcoming Features
+
+- [ ] Real-time exchange rates integration
+- [ ] Advanced data visualization
+- [ ] Budget tracking and alerts
+- [ ] Export functionality
+- [ ] Enhanced error handling
+- [ ] User preferences
+- [ ] Mobile app version
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a new branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## 📄 License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## 📊 Testing
 
 The project uses Jest and React Testing Library for testing. The test files are located in the `tests` directory.
 
@@ -124,7 +166,7 @@ npm run test:coverage
   - `/shared/` - Shared component tests (Button, Input, etc.)
 - `/tests/setupTests.js` - Test setup and configuration
 
-## Project Structure
+## 📈 Project Structure
 
 ```
 expense-dashboard/
@@ -146,15 +188,7 @@ expense-dashboard/
 └── package.json
 ```
 
-## Contributing
-
-1. Fork the repository
-2. Create a new branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-## Environment Setup
+## 📈 Environment Setup
 
 The application requires the following environment variables:
 
@@ -168,11 +202,11 @@ VITE_FIREBASE_MESSAGING_SENDER_ID=your_firebase_messaging_sender_id
 VITE_FIREBASE_APP_ID=your_firebase_app_id
 
 # Supabase Configuration
-VITE_SUPABASE_URL=your_supabase_project_url
+VITE_SUPABASE_URL=your_supabase_url
 VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
 ```
 
-## Continuous Integration
+## 📈 Continuous Integration
 
 This project uses GitHub Actions for continuous integration. The CI pipeline:
 
@@ -181,7 +215,7 @@ This project uses GitHub Actions for continuous integration. The CI pipeline:
 - Builds the application
 - Uploads build artifacts
 
-The workflow runs on Node.js versions 18.x and 20.x to ensure compatibility.
+The workflow runs on Node.js versions 14.x and 16.x to ensure compatibility.
 
 ### CI Environment Variables
 
@@ -202,7 +236,7 @@ To set up these secrets:
 3. Click "New repository secret"
 4. Add each configuration value
 
-## Available Scripts
+## 📈 Available Scripts
 
 - `npm run dev` - Start development server
 - `npm run build` - Build for production
@@ -210,21 +244,21 @@ To set up these secrets:
 - `npm run lint` - Run ESLint
 - `npm test` - Run tests
 
-## Security
+## 📈 Security
 
 - Environment variables are used for sensitive data
 - Firebase Authentication handles user security
 - Input validation and sanitization implemented
 - Protected routes for authenticated users
 
-## Browser Support
+## 📈 Browser Support
 
 - Chrome (latest)
 - Firefox (latest)
 - Safari (latest)
 - Edge (latest)
 
-## Future Enhancements
+## 📈 Future Enhancements
 
 - [ ] Dark mode support
 - [ ] Multiple currency support
@@ -233,18 +267,18 @@ To set up these secrets:
 - [ ] Advanced analytics
 - [ ] Budget planning features
 
-## License
+## 📈 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License - see the LICENSE file for details.
 
-## Acknowledgments
+## 📈 Acknowledgments
 
 - Firebase for authentication and database services
 - Supabase for database services
 - Tailwind CSS for styling
 - React community for excellent documentation and support
 
-## Contact
+## 📈 Contact
 
 
 Arsim Ajvazi - [@arsim_ajv](https://instagram.com/arsim_ajv)
