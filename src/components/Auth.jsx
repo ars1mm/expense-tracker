@@ -3,6 +3,7 @@ import { auth, googleProvider } from '../config/firebase';
 import { signInWithPopup, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from 'firebase/auth';
 import LoginForm from './auth/LoginForm';
 import SignupForm from './auth/SignupForm';
+import PropTypes from 'prop-types';
 
 const Auth = ({ user, setUser }) => {
   const [isSignUp, setIsSignUp] = useState(false);
@@ -117,6 +118,11 @@ const Auth = ({ user, setUser }) => {
       )}
     </>
   );
+};
+
+Auth.propTypes = {
+  user: PropTypes.object,
+  setUser: PropTypes.func.isRequired,
 };
 
 export default Auth;
