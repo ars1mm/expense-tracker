@@ -1,6 +1,6 @@
 # Expense Dashboard
 
-A modern, user-friendly expense tracking application built with React and Firebase. Track your personal finances with ease, visualize spending patterns, and manage your budget effectively.
+A modern, user-friendly expense tracking application built with React, Firebase, and Supabase. Track your personal finances with ease, visualize spending patterns, and manage your budget effectively.
 
 [![CI](https://github.com/[username]/expense-dashboard/actions/workflows/ci.yml/badge.svg)](https://github.com/[username]/expense-dashboard/actions/workflows/ci.yml)
 
@@ -13,7 +13,7 @@ A modern, user-friendly expense tracking application built with React and Fireba
   - Protected routes
 
 - 💰 Expense Management
-  - Track expenses in Macedonian Denars (MKD)
+  - Track expenses in multiple currencies
   - Categorize transactions
   - Add, edit, and delete expenses
   - View spending history
@@ -29,7 +29,7 @@ A modern, user-friendly expense tracking application built with React and Fireba
 - **Frontend Framework**: React with Vite
 - **Styling**: Tailwind CSS
 - **Authentication**: Firebase Auth
-- **Database**: Firebase Firestore
+- **Database**: Firebase Firestore and Supabase
 - **State Management**: React Hooks
 - **Build Tool**: Vite
 
@@ -39,6 +39,7 @@ Before you begin, ensure you have the following installed:
 - Node.js (v18 or higher)
 - npm
 - Firebase account
+- Supabase account
 
 ## Getting Started
 
@@ -54,15 +55,36 @@ Before you begin, ensure you have the following installed:
    ```
 
 3. **Set up environment variables**
-   Create a `.env` file in the root directory and add your Firebase configuration:
+   Create a `.env` file in the root directory with the following variables:
+
    ```env
-   VITE_FIREBASE_API_KEY=your_api_key
-   VITE_FIREBASE_AUTH_DOMAIN=your_auth_domain
-   VITE_FIREBASE_PROJECT_ID=your_project_id
-   VITE_FIREBASE_STORAGE_BUCKET=your_storage_bucket
-   VITE_FIREBASE_MESSAGING_SENDER_ID=your_messaging_sender_id
-   VITE_FIREBASE_APP_ID=your_app_id
+   # Firebase Configuration
+   VITE_FIREBASE_API_KEY=your_firebase_api_key
+   VITE_FIREBASE_AUTH_DOMAIN=your_firebase_auth_domain
+   VITE_FIREBASE_PROJECT_ID=your_firebase_project_id
+   VITE_FIREBASE_STORAGE_BUCKET=your_firebase_storage_bucket
+   VITE_FIREBASE_MESSAGING_SENDER_ID=your_firebase_messaging_sender_id
+   VITE_FIREBASE_APP_ID=your_firebase_app_id
+
+   # Supabase Configuration
+   VITE_SUPABASE_URL=your_supabase_project_url
+   VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
    ```
+
+   To get these values:
+
+   1. **Firebase Configuration**:
+      - Create a project at [Firebase Console](https://console.firebase.google.com/)
+      - Go to Project Settings > General
+      - Scroll down to "Your apps" and create a web app
+      - Copy the configuration values
+
+   2. **Supabase Configuration**:
+      - Create a project at [Supabase](https://supabase.com)
+      - Go to Project Settings > API
+      - Copy the Project URL and anon/public key
+
+   ⚠️ **Important**: Never commit the `.env` file to version control. It's already included in `.gitignore`.
 
 4. **Start the development server**
    ```bash
@@ -137,12 +159,17 @@ expense-dashboard/
 The application requires the following environment variables:
 
 ```env
-VITE_FIREBASE_API_KEY=
-VITE_FIREBASE_AUTH_DOMAIN=
-VITE_FIREBASE_PROJECT_ID=
-VITE_FIREBASE_STORAGE_BUCKET=
-VITE_FIREBASE_MESSAGING_SENDER_ID=
-VITE_FIREBASE_APP_ID=
+# Firebase Configuration
+VITE_FIREBASE_API_KEY=your_firebase_api_key
+VITE_FIREBASE_AUTH_DOMAIN=your_firebase_auth_domain
+VITE_FIREBASE_PROJECT_ID=your_firebase_project_id
+VITE_FIREBASE_STORAGE_BUCKET=your_firebase_storage_bucket
+VITE_FIREBASE_MESSAGING_SENDER_ID=your_firebase_messaging_sender_id
+VITE_FIREBASE_APP_ID=your_firebase_app_id
+
+# Supabase Configuration
+VITE_SUPABASE_URL=your_supabase_project_url
+VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
 ```
 
 ## Continuous Integration
@@ -166,12 +193,14 @@ The following secrets need to be set in your GitHub repository settings:
 - `FIREBASE_STORAGE_BUCKET`
 - `FIREBASE_MESSAGING_SENDER_ID`
 - `FIREBASE_APP_ID`
+- `SUPABASE_URL`
+- `SUPABASE_ANON_KEY`
 
 To set up these secrets:
 1. Go to your GitHub repository
 2. Navigate to Settings > Secrets and variables > Actions
 3. Click "New repository secret"
-4. Add each Firebase configuration value
+4. Add each configuration value
 
 ## Available Scripts
 
@@ -211,6 +240,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## Acknowledgments
 
 - Firebase for authentication and database services
+- Supabase for database services
 - Tailwind CSS for styling
 - React community for excellent documentation and support
 

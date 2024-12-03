@@ -1,26 +1,62 @@
-import { formatCurrency } from '../utils/currency'
+import { useState } from 'react'
+import { formatCurrency, convertCurrency } from '../utils/currency'
+import CurrencySelector from './CurrencySelector'
+import PropTypes from 'prop-types'
 
-const StatCard = ({ title, value, color }) => (
+const StatCard = ({ title, value, color, children }) => (
   <div className="bg-white rounded-xl shadow-lg p-6 transform transition-all hover:shadow-xl">
-    <h3 className="text-gray-500 text-sm font-medium mb-2">{title}</h3>
-    <p className={`text-2xl font-bold ${color}`}>{value}</p>
+    <div className="flex items-center justify-between gap-4 mb-2">
+      <h3 className="text-gray-500 text-sm font-medium">{title}</h3>
+      {children}
+    </div>
+    <p className={`text-2xl font-bold ${color} min-w-[120px]`}>{value}</p>
   </div>
 )
 
+StatCard.propTypes = {
+  title: PropTypes.string.isRequired,
+  value: PropTypes.string.isRequired,
+  color: PropTypes.string.isRequired,
+  children: PropTypes.node
+}
+
 const Statistics = ({ expenses }) => {
-  const totalExpenses = expenses.reduce((sum, expense) => sum + expense.amount, 0)
-  const highestExpense = Math.max(...expenses.map(expense => expense.amount), 0)
+  const [displayCurrency, setDisplayCurrency] = useState('MKD')
+
+  // Convert and sum all expenses to the selected currency
+  const totalExpenses = expenses.reduce((sum, expense) => {
+    const convertedAmount = convertCurrency(
+      expense.amount,
+      expense.currency,
+      displayCurrency
+    )
+    return sum + convertedAmount
+  }, 0)
+
+  // Convert highest expense to selected currency
+  const highestExpense = Math.max(
+    ...expenses.map(expense => 
+      convertCurrency(expense.amount, expense.currency, displayCurrency)
+    ),
+    0
+  )
+
   const latestExpense = expenses.length > 0 
-    ? new Date(expenses[expenses.length - 1].date).toLocaleDateString('en-US', {
+    ? new Date(expenses[0].date).toLocaleDateString('en-US', {
         year: 'numeric',
         month: 'short',
         day: 'numeric'
       })
     : 'No expenses yet'
 
-  // Group expenses by category
+  // Group expenses by category (in selected currency)
   const expensesByCategory = expenses.reduce((acc, expense) => {
-    acc[expense.category] = (acc[expense.category] || 0) + expense.amount
+    const convertedAmount = convertCurrency(
+      expense.amount,
+      expense.currency,
+      displayCurrency
+    )
+    acc[expense.category] = (acc[expense.category] || 0) + convertedAmount
     return acc
   }, {})
 
@@ -29,17 +65,25 @@ const Statistics = ({ expenses }) => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatCard
           title="Total Expenses"
-          value={formatCurrency(totalExpenses)}
+          value={formatCurrency(totalExpenses, displayCurrency)}
           color="text-blue-600"
-        />
+        >
+          <div className="w-32">
+            <CurrencySelector
+              selectedCurrency={displayCurrency}
+              onCurrencyChange={setDisplayCurrency}
+              compact={true}
+            />
+          </div>
+        </StatCard>
         <StatCard
           title="Number of Expenses"
-          value={expenses.length}
+          value={expenses.length.toString()}
           color="text-green-600"
         />
         <StatCard
           title="Highest Expense"
-          value={formatCurrency(highestExpense)}
+          value={formatCurrency(highestExpense, displayCurrency)}
           color="text-red-600"
         />
         <StatCard
@@ -49,19 +93,37 @@ const Statistics = ({ expenses }) => {
         />
       </div>
 
-      <div className="bg-white rounded-xl shadow-lg p-6">
-        <h2 className="text-xl font-bold text-gray-800 mb-4">Expenses by Category</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {Object.entries(expensesByCategory).map(([category, amount]) => (
-            <div key={category} className="p-4 bg-gray-50 rounded-lg">
-              <h3 className="text-sm font-medium text-gray-500 mb-1">{category}</h3>
-              <p className="text-lg font-bold text-gray-900">{formatCurrency(amount)}</p>
-            </div>
-          ))}
+      {/* Category breakdown */}
+      {Object.keys(expensesByCategory).length > 0 && (
+        <div className="bg-white rounded-xl shadow-lg p-6">
+          <h3 className="text-gray-500 text-sm font-medium mb-4">Expenses by Category</h3>
+          <div className="space-y-3">
+            {Object.entries(expensesByCategory)
+              .sort(([, a], [, b]) => b - a)
+              .map(([category, amount]) => (
+                <div key={category} className="flex justify-between items-center">
+                  <span className="text-gray-600">{category}</span>
+                  <span className="font-medium min-w-[100px] text-right">
+                    {formatCurrency(amount, displayCurrency)}
+                  </span>
+                </div>
+              ))}
+          </div>
         </div>
-      </div>
+      )}
     </div>
   )
+}
+
+Statistics.propTypes = {
+  expenses: PropTypes.arrayOf(
+    PropTypes.shape({
+      amount: PropTypes.number.isRequired,
+      currency: PropTypes.string.isRequired,
+      category: PropTypes.string.isRequired,
+      date: PropTypes.string.isRequired
+    })
+  ).isRequired
 }
 
 export default Statistics
