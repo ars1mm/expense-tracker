@@ -2,6 +2,7 @@ import { useState } from 'react'
 import PropTypes from 'prop-types'
 import CurrencySelector from './CurrencySelector'
 import { addExpense } from '../services/supabase'
+import { auth } from '../config/firebase'
 
 const ExpenseForm = ({ onAddExpense }) => {
   const [formData, setFormData] = useState({
@@ -41,21 +42,34 @@ const ExpenseForm = ({ onAddExpense }) => {
     setError(null)
 
     try {
-      const expenseData = {
-        ...formData,
-        amount: parseFloat(formData.amount)
+      const user = auth.currentUser
+      
+      if (!user) {
+        throw new Error('Please sign in to add expenses')
       }
-      const savedExpense = await addExpense(expenseData)
-      onAddExpense(savedExpense)
-      setFormData({
-        description: '',
-        amount: '',
-        category: '',
-        date: new Date().toISOString().split('T')[0],
-        currency: 'MKD'
-      })
+
+      const expenseData = {
+        description: formData.description,
+        amount: parseFloat(formData.amount),
+        category: formData.category,
+        date: formData.date,
+        currency: formData.currency
+      }
+
+      const newExpense = await addExpense(expenseData, user.uid)
+      
+      if (newExpense) {
+        onAddExpense(newExpense)
+        setFormData({
+          description: '',
+          amount: '',
+          category: '',
+          date: new Date().toISOString().split('T')[0],
+          currency: 'MKD'
+        })
+      }
     } catch (err) {
-      setError('Failed to add expense. Please try again.')
+      setError(err.message || 'Failed to add expense. Please try again.')
       console.error('Error:', err)
     } finally {
       setIsSubmitting(false)

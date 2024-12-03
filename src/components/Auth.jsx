@@ -12,17 +12,27 @@ const Auth = ({ user, setUser }) => {
   const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
 
+  const getAndLogToken = async (user) => {
+    if (user) {
+      try {
+        const token = await user.getIdToken();
+        console.log('Firebase JWT Token:', token);
+        const tokenResult = await user.getIdTokenResult();
+        console.log('Token Data:', tokenResult);
+      } catch (err) {
+        console.error('Error getting token:', err);
+      }
+    }
+  };
+
   const handleEmailAuth = async (e) => {
     e.preventDefault();
     setError('');
     try {
-      if (isSignUp) {
-        const result = await createUserWithEmailAndPassword(auth, email, password);
-        setUser(result.user);
-      } else {
-        const result = await signInWithEmailAndPassword(auth, email, password);
-        setUser(result.user);
-      }
+      const authFunction = isSignUp ? createUserWithEmailAndPassword : signInWithEmailAndPassword;
+      const result = await authFunction(auth, email, password);
+      setUser(result.user);
+      await getAndLogToken(result.user);
       setEmail('');
       setPassword('');
     } catch (err) {
@@ -34,6 +44,7 @@ const Auth = ({ user, setUser }) => {
     try {
       const result = await signInWithPopup(auth, googleProvider);
       setUser(result.user);
+      await getAndLogToken(result.user);
     } catch (err) {
       setError(err.message);
     }
@@ -93,7 +104,6 @@ const Auth = ({ user, setUser }) => {
       ) : (
         <div className="min-h-screen flex items-center justify-center">
           <div className="w-screen min-h-screen bg-[#4169E1] dark:bg-gray-900 flex items-center justify-center transition-colors">
-            {/* Login/Signup Card */}
             <div className={`w-[500px] bg-white dark:bg-gray-800 p-8 rounded-lg shadow-lg transition-all duration-300 transform ${isSignUp ? 'scale-0 absolute' : 'scale-100'}`}>
               <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-8 text-center">
                 Login

@@ -17,7 +17,7 @@ export const addExpense = async (expenseData, userId) => {
         category: expenseData.category,
         date: expenseData.date,
         user_id: userId.toString()
-      }], getHeaders(userId))
+      }])
       .select()
 
     if (error) throw error
