@@ -1,6 +1,6 @@
 import { supabase } from '../config/supabase'
 
-export const addExpense = async (expenseData) => {
+export const addExpense = async (expenseData, userId) => {
   try {
     const { data, error } = await supabase
       .from('expenses')
@@ -10,7 +10,8 @@ export const addExpense = async (expenseData) => {
           amount: expenseData.amount,
           currency: expenseData.currency,
           category: expenseData.category,
-          date: expenseData.date
+          date: expenseData.date,
+          user_id: userId
         }
       ])
       .select()
@@ -23,11 +24,12 @@ export const addExpense = async (expenseData) => {
   }
 }
 
-export const getExpenses = async () => {
+export const getExpenses = async (userId) => {
   try {
     const { data, error } = await supabase
       .from('expenses')
       .select('*')
+      .eq('user_id', userId)
       .order('date', { ascending: false })
 
     if (error) throw error
@@ -38,12 +40,13 @@ export const getExpenses = async () => {
   }
 }
 
-export const deleteExpense = async (id) => {
+export const deleteExpense = async (id, userId) => {
   try {
     const { error } = await supabase
       .from('expenses')
       .delete()
       .eq('id', id)
+      .eq('user_id', userId) // Only delete if the expense belongs to the user
 
     if (error) throw error
     return id
@@ -54,12 +57,16 @@ export const deleteExpense = async (id) => {
 }
 
 // Real-time subscription for expenses
-export const subscribeToExpenses = (callback) => {
+export const subscribeToExpenses = (callback, userId) => {
   const subscription = supabase
     .from('expenses')
     .on('*', payload => {
-      callback(payload)
+      // Only notify about changes to the user's expenses
+      if (payload.new && payload.new.user_id === userId) {
+        callback(payload)
+      }
     })
+    .eq('user_id', userId)
     .subscribe()
 
   return () => {
