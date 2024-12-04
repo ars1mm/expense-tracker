@@ -1,11 +1,16 @@
-import { formatCurrency } from '../utils/currency'
+import { auth } from '../config/firebase'
 import { deleteExpense } from '../services/supabase'
+import { formatCurrency } from '../utils/currency'
 import PropTypes from 'prop-types'
 
 const ExpensesList = ({ expenses, onExpenseDeleted }) => {
   const handleDelete = async (id) => {
     try {
-      await deleteExpense(id)
+      const user = auth.currentUser
+      if (!user) {
+        throw new Error('User not authenticated')
+      }
+      await deleteExpense(id, user.uid)
       onExpenseDeleted(id)
     } catch (error) {
       console.error('Error deleting expense:', error)
@@ -18,27 +23,27 @@ const ExpensesList = ({ expenses, onExpenseDeleted }) => {
       {expenses.map((expense) => (
         <div 
           key={expense.id}
-          className="flex items-center justify-between p-4 bg-white rounded-lg shadow hover:shadow-md transition-shadow"
+          className="flex items-center justify-between p-4 bg-white rounded-lg shadow hover:shadow-md transition-shadow dark:bg-gray-800"
         >
           <div className="flex items-center space-x-4">
-            <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
-              <span className="text-blue-600 text-lg">{expense.currency}</span>
+            <div className="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
+              <span className="text-blue-600 dark:text-blue-300 text-lg">{expense.currency}</span>
             </div>
             <div>
-              <h3 className="font-medium text-gray-800">{expense.description}</h3>
-              <p className="text-sm text-gray-500">{expense.date}</p>
+              <h3 className="font-medium text-gray-800 dark:text-gray-200">{expense.description}</h3>
+              <p className="text-sm text-gray-500 dark:text-gray-400">{expense.date}</p>
             </div>
           </div>
           <div className="flex items-center space-x-4">
             <div className="text-right">
-              <p className="font-semibold text-gray-800">
+              <p className="font-semibold text-gray-800 dark:text-gray-200">
                 {formatCurrency(expense.amount, expense.currency)}
               </p>
-              <p className="text-sm text-gray-500">{expense.category}</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">{expense.category}</p>
             </div>
             <button
               onClick={() => handleDelete(expense.id)}
-              className="p-2 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-full transition-colors"
+              className="p-2 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-full transition-colors dark:text-red-400 dark:hover:text-red-300 dark:hover:bg-red-900"
               title="Delete expense"
             >
               <svg
@@ -69,10 +74,10 @@ ExpensesList.propTypes = {
       amount: PropTypes.number.isRequired,
       currency: PropTypes.string.isRequired,
       category: PropTypes.string.isRequired,
-      date: PropTypes.string.isRequired
+      date: PropTypes.string.isRequired,
     })
   ).isRequired,
-  onExpenseDeleted: PropTypes.func.isRequired
+  onExpenseDeleted: PropTypes.func.isRequired,
 }
 
 export default ExpensesList

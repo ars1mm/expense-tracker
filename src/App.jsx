@@ -6,7 +6,12 @@ import Statistics from './components/Statistics'
 import Auth from './components/Auth'
 import { auth } from './config/firebase'
 import { onAuthStateChanged } from 'firebase/auth'
-import { getExpenses, addExpense as addExpenseToSupabase, deleteExpense as deleteExpenseFromSupabase } from './services/supabase'
+import { 
+  getExpenses as getExpensesFromSupabase, 
+  addExpense as addExpenseToSupabase, 
+  deleteExpense as deleteExpenseFromSupabase,
+  subscribeToExpenses 
+} from './services/supabase'
 import { FaMoon, FaSun } from 'react-icons/fa'
 
 function App() {
@@ -30,39 +35,91 @@ function App() {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser)
+      if (!currentUser) {
+        setExpenses([])
+      }
     })
 
     return () => unsubscribe()
   }, [])
 
   useEffect(() => {
-    const fetchExpenses = async () => {
-      if (user) {  
+    let unsubscribe = null
+
+    const setupSubscription = async () => {
+      if (user) {
         try {
-          const data = await getExpenses(user.uid)
+          // Initial fetch
+          const data = await getExpensesFromSupabase(user.uid)
           setExpenses(data)
+          setLoading(false)
+
+          // Set up real-time subscription
+          unsubscribe = subscribeToExpenses((payload) => {
+            console.log('Handling real-time update:', payload)
+            
+            if (payload.eventType === 'INSERT') {
+              setExpenses(prev => {
+                const newExpense = payload.new
+                // Check if expense already exists
+                if (prev.some(exp => exp.id === newExpense.id)) {
+                  return prev
+                }
+                // Add new expense and sort by date
+                const updated = [newExpense, ...prev]
+                return updated.sort((a, b) => new Date(b.date) - new Date(a.date))
+              })
+            } 
+            else if (payload.eventType === 'DELETE') {
+              setExpenses(prev => prev.filter(exp => exp.id !== payload.old.id))
+            }
+          }, user.uid)
         } catch (error) {
-          console.error('Error fetching expenses:', error)
-        } finally {
+          console.error('Error setting up expenses:', error)
           setLoading(false)
         }
+      } else {
+        setExpenses([])
+        setLoading(false)
       }
     }
 
-    fetchExpenses()
-  }, [user])  
+    setupSubscription()
+
+    return () => {
+      if (unsubscribe) {
+        unsubscribe()
+      }
+    }
+  }, [user])
 
   const addExpense = async (newExpense) => {
     if (user) {
-      const savedExpense = await addExpenseToSupabase(newExpense, user.uid)
-      setExpenses([savedExpense, ...expenses])
+      try {
+        const savedExpense = await addExpenseToSupabase(newExpense, user.uid)
+        // Optimistically add to state
+        setExpenses(prev => {
+          const updated = [savedExpense, ...prev]
+          return updated.sort((a, b) => new Date(b.date) - new Date(a.date))
+        })
+      } catch (error) {
+        console.error('Error adding expense:', error)
+      }
     }
   }
 
-  const handleExpenseDeleted = async (deletedId) => {
+  const handleExpenseDeleted = async (id) => {
     if (user) {
-      await deleteExpenseFromSupabase(deletedId, user.uid)
-      setExpenses(expenses.filter(expense => expense.id !== deletedId))
+      try {
+        // Optimistically remove from state
+        setExpenses(prev => prev.filter(exp => exp.id !== id))
+        await deleteExpenseFromSupabase(id, user.uid)
+      } catch (error) {
+        console.error('Error deleting expense:', error)
+        // Fetch expenses again if delete fails
+        const data = await getExpensesFromSupabase(user.uid)
+        setExpenses(data)
+      }
     }
   }
 
