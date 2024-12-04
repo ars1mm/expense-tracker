@@ -179,6 +179,17 @@ const Auth = ({ user, setUser }) => {
             </div>
           </div>
 
+          <p className="text-center text-gray-600">
+            {isSignUp ? 'Already have an account?' : "Don't have an account?"}{' '}
+            <button
+              data-testid={isSignUp ? 'login-button' : 'signup-button'}
+              className="text-blue-500 hover:text-blue-600"
+              onClick={() => setIsSignUp(!isSignUp)}
+            >
+              {isSignUp ? 'Login' : 'Signup'}
+            </button>
+          </p>
+
           {error && (
             <div className="fixed bottom-4 right-4 max-w-md p-4 bg-red-100 dark:bg-red-900 border border-red-400 dark:border-red-700 text-red-700 dark:text-red-200 rounded-lg shadow-lg">
               <div className="flex items-center">
