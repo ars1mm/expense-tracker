@@ -13,6 +13,7 @@ import {
   subscribeToExpenses 
 } from './services/supabase'
 import { FaMoon, FaSun } from 'react-icons/fa'
+import { validateEnv } from './utils/env'
 
 function App() {
   const [expenses, setExpenses] = useState([])
@@ -23,6 +24,13 @@ function App() {
   })
 
   useEffect(() => {
+    // Validate environment variables
+    try {
+      validateEnv()
+    } catch (error) {
+      console.error('Environment validation failed:', error)
+    }
+
     if (darkMode) {
       document.documentElement.classList.add('dark')
       localStorage.setItem('theme', 'dark')
