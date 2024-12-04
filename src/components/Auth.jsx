@@ -162,16 +162,16 @@ const Auth = ({ user, setUser }) => {
           </div>
         </div>
       ) : (
-        <div className="min-h-screen flex items-center justify-center">
+        <div className="min-h-screen flex items-center justify-center p-4">
           <div className="w-screen min-h-screen bg-[#4169E1] dark:bg-gray-900 flex items-center justify-center transition-colors">
-            <div className={`w-[500px] bg-white dark:bg-gray-800 p-8 rounded-lg shadow-lg transition-all duration-300 transform ${isSignUp ? 'scale-0 absolute' : 'scale-100'}`}>
+            <div className="w-full max-w-[500px] mx-4 bg-white dark:bg-gray-800 p-6 sm:p-8 rounded-lg shadow-lg transition-all duration-300 transform scale-100">
               <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-8 text-center">
                 Login
               </h2>
               <LoginForm {...formProps} />
             </div>
 
-            <div className={`w-[500px] bg-white dark:bg-gray-800 p-8 rounded-lg shadow-lg transition-all duration-300 transform ${!isSignUp ? 'scale-0 absolute' : 'scale-100'}`}>
+            <div className="w-full max-w-[500px] mx-4 bg-white dark:bg-gray-800 p-6 sm:p-8 rounded-lg shadow-lg transition-all duration-300 transform scale-0 absolute">
               <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-8 text-center">
                 Signup
               </h2>

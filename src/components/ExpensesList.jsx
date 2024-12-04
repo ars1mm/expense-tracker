@@ -19,22 +19,22 @@ const ExpensesList = ({ expenses, onExpenseDeleted }) => {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 p-4">
       {expenses.map((expense) => (
         <div 
           key={expense.id}
-          className="flex items-center justify-between p-4 bg-white rounded-lg shadow hover:shadow-md transition-shadow dark:bg-gray-800"
+          className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 bg-white rounded-lg shadow hover:shadow-md transition-shadow dark:bg-gray-800 space-y-3 sm:space-y-0"
         >
-          <div className="flex items-center space-x-4">
-            <div className="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
+          <div className="flex items-center space-x-4 w-full sm:w-auto">
+            <div className="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center flex-shrink-0">
               <span className="text-blue-600 dark:text-blue-300 text-lg">{expense.currency}</span>
             </div>
-            <div>
+            <div className="flex-grow sm:flex-grow-0">
               <h3 className="font-medium text-gray-800 dark:text-gray-200">{expense.description}</h3>
               <p className="text-sm text-gray-500 dark:text-gray-400">{expense.date}</p>
             </div>
           </div>
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center justify-between w-full sm:w-auto space-x-4">
             <div className="text-right">
               <p className="font-semibold text-gray-800 dark:text-gray-200">
                 {formatCurrency(expense.amount, expense.currency)}

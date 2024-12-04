@@ -77,98 +77,68 @@ const ExpenseForm = ({ onAddExpense }) => {
   }
 
   return (
-    <div className="bg-white rounded-xl shadow-lg p-6 mb-6 transform transition-all hover:shadow-xl">
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold text-gray-800">Add New Expense</h2>
-        <div className="w-48">
-          <CurrencySelector
-            selectedCurrency={formData.currency}
-            onCurrencyChange={(currency) => setFormData(prev => ({ ...prev, currency }))}
-          />
-        </div>
-      </div>
-
-      {error && (
-        <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-lg">
-          {error}
-        </div>
-      )}
-
-      <form onSubmit={handleSubmit} autoComplete="off">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700" htmlFor="description">
-              Description
-            </label>
+    <div className="w-full max-w-2xl mx-auto p-4">
+      <form onSubmit={handleSubmit} className="space-y-4 bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 sm:p-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="col-span-1 sm:col-span-2">
             <input
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50 transition-all text-black"
-              id="description"
               type="text"
               name="description"
-              placeholder="What did you spend on?"
               value={formData.description}
               onChange={handleChange}
+              placeholder="Description"
+              className="w-full px-4 py-3 rounded-lg bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
               required
-              autoComplete="off"
             />
           </div>
-
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-black" htmlFor="amount">
-              Amount
-            </label>
+          <div>
             <input
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50 transition-all text-black"
-              id="amount"
               type="number"
               name="amount"
               value={formData.amount}
               onChange={handleChange}
+              placeholder="Amount"
+              className="w-full px-4 py-3 rounded-lg bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
               required
-              min="0"
-              step="any"
-              placeholder="Enter amount"
             />
           </div>
-
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-black" htmlFor="category">
-              Category
-            </label>
+          <div>
+            <CurrencySelector
+              value={formData.currency}
+              onChange={(value) => handleChange({ target: { name: 'currency', value } })}
+              className="w-full"
+            />
+          </div>
+          <div>
             <select
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50 transition-all appearance-none text-black"
-              id="category"
               name="category"
               value={formData.category}
               onChange={handleChange}
+              className="w-full px-4 py-3 rounded-lg bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
               required
             >
-              <option value="">Select a category</option>
+              <option value="">Select Category</option>
               {categories.map(category => (
-                <option key={category} value={category}>
-                  {category}
-                </option>
+                <option key={category} value={category}>{category}</option>
               ))}
             </select>
           </div>
-
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-black" htmlFor="date">
-              Date
-            </label>
+          <div>
             <input
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50 transition-all text-black"
-              id="date"
               type="date"
               name="date"
               value={formData.date}
               onChange={handleChange}
+              className="w-full px-4 py-3 rounded-lg bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
               required
-              autoComplete="off"
             />
           </div>
         </div>
-
+        {error && (
+          <div className="mt-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg">
+            {error}
+          </div>
+        )}
         <div className="mt-6">
           <button
             type="submit"
