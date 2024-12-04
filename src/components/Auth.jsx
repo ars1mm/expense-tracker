@@ -11,6 +11,7 @@ const Auth = ({ user, setUser }) => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const getAndLogToken = async (user) => {
     if (user) {
@@ -28,6 +29,21 @@ const Auth = ({ user, setUser }) => {
   const handleEmailAuth = async (e) => {
     e.preventDefault();
     setError('');
+    setLoading(true);
+
+    // Basic validation
+    if (!email || !password) {
+      setError('Please fill in all fields');
+      setLoading(false);
+      return;
+    }
+
+    if (password.length < 6) {
+      setError('Password must be at least 6 characters long');
+      setLoading(false);
+      return;
+    }
+
     try {
       const authFunction = isSignUp ? createUserWithEmailAndPassword : signInWithEmailAndPassword;
       const result = await authFunction(auth, email, password);
@@ -36,26 +52,65 @@ const Auth = ({ user, setUser }) => {
       setEmail('');
       setPassword('');
     } catch (err) {
-      setError(err.message);
+      console.error('Auth error:', err);
+      let errorMessage = 'An error occurred during authentication';
+      
+      switch (err.code) {
+        case 'auth/email-already-in-use':
+          errorMessage = 'This email is already registered. Please sign in instead.';
+          break;
+        case 'auth/invalid-email':
+          errorMessage = 'Please enter a valid email address.';
+          break;
+        case 'auth/operation-not-allowed':
+          errorMessage = 'Email/password accounts are not enabled. Please contact support.';
+          break;
+        case 'auth/weak-password':
+          errorMessage = 'Please choose a stronger password.';
+          break;
+        case 'auth/user-not-found':
+        case 'auth/wrong-password':
+          errorMessage = 'Invalid email or password.';
+          break;
+        default:
+          errorMessage = err.message;
+      }
+      
+      setError(errorMessage);
+    } finally {
+      setLoading(false);
     }
   };
 
   const signInWithGoogle = async () => {
+    setError('');
+    setLoading(true);
     try {
       const result = await signInWithPopup(auth, googleProvider);
       setUser(result.user);
       await getAndLogToken(result.user);
     } catch (err) {
+      console.error('Google sign-in error:', err);
+      if (err.code === 'auth/popup-closed-by-user') {
+        return;
+      }
       setError(err.message);
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleSignOut = async () => {
+    setError('');
+    setLoading(true);
     try {
       await signOut(auth);
       setUser(null);
     } catch (err) {
+      console.error('Sign out error:', err);
       setError(err.message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -69,6 +124,8 @@ const Auth = ({ user, setUser }) => {
     handleEmailAuth,
     signInWithGoogle,
     setIsSignUp,
+    loading,
+    error
   };
 
   return (
@@ -93,9 +150,12 @@ const Auth = ({ user, setUser }) => {
                 </div>
                 <button
                   onClick={handleSignOut}
-                  className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+                  disabled={loading}
+                  className={`px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
+                    loading ? 'animate-pulse' : ''
+                  }`}
                 >
-                  Sign Out
+                  {loading ? 'Signing out...' : 'Sign Out'}
                 </button>
               </div>
             </div>
@@ -120,8 +180,27 @@ const Auth = ({ user, setUser }) => {
           </div>
 
           {error && (
-            <div className="absolute bottom-4 right-4 bg-red-100 dark:bg-red-900 border border-red-400 dark:border-red-700 text-red-700 dark:text-red-200 px-4 py-3 rounded-lg">
-              {error}
+            <div className="fixed bottom-4 right-4 max-w-md p-4 bg-red-100 dark:bg-red-900 border border-red-400 dark:border-red-700 text-red-700 dark:text-red-200 rounded-lg shadow-lg">
+              <div className="flex items-center">
+                <div className="flex-shrink-0">
+                  <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                  </svg>
+                </div>
+                <div className="ml-3">
+                  <p className="text-sm">{error}</p>
+                </div>
+                <div className="ml-auto pl-3">
+                  <button
+                    onClick={() => setError('')}
+                    className="inline-flex text-red-400 hover:text-red-500"
+                  >
+                    <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
             </div>
           )}
         </div>
