@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import './App.css'
 import ExpensesList from './components/ExpensesList'
 import ExpenseForm from './components/ExpenseForm'
@@ -46,6 +47,7 @@ function App() {
       if (!currentUser) {
         setExpenses([])
       }
+      setLoading(false)
     })
 
     return () => unsubscribe()
@@ -136,36 +138,52 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 transition-colors duration-200">
-      <button
-        onClick={toggleDarkMode}
-        className="fixed top-4 right-4 p-2 rounded-full bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors z-50"
-        aria-label="Toggle dark mode"
-      >
-        {darkMode ? <FaSun className="text-yellow-400 w-5 h-5" /> : <FaMoon className="text-gray-700 dark:text-gray-300 w-5 h-5" />}
-      </button>
-      
-      <Auth user={user} setUser={setUser} darkMode={darkMode} />
-      
-      {user && (
-        <div className="container mx-auto px-4 py-8">
-          <div className="space-y-6">
-            <ExpenseForm onAddExpense={addExpense} />
-            <Statistics expenses={expenses} />
-            {loading ? (
-              <div className="text-center py-4">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto"></div>
-              </div>
-            ) : (
-              <ExpensesList 
-                expenses={expenses} 
-                onExpenseDeleted={handleExpenseDeleted} 
-              />
-            )}
+    <Router>
+      <div className="h-screen w-screen bg-gray-50 dark:bg-gray-900 transition-colors overflow-hidden">
+        {loading ? (
+          <div className="flex items-center justify-center min-h-screen">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
           </div>
-        </div>
-      )}
-    </div>
+        ) : (
+          <Routes>
+            <Route 
+              path="/" 
+              element={
+                user ? <Navigate to="/dashboard" /> : <Auth />
+              } 
+            />
+            <Route 
+              path="/dashboard" 
+              element={
+                user ? (
+                  <div className="container mx-auto px-4 py-8">
+                    <div className="flex justify-end mb-4">
+                      <button
+                        onClick={toggleDarkMode}
+                        className="p-2 rounded-lg bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+                      >
+                        {darkMode ? <FaSun className="text-yellow-500" /> : <FaMoon className="text-gray-700" />}
+                      </button>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                      <div>
+                        <ExpenseForm onAddExpense={addExpense} />
+                        <ExpensesList expenses={expenses} onDeleteExpense={handleExpenseDeleted} />
+                      </div>
+                      <div className="sticky top-8">
+                        <Statistics expenses={expenses} />
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <Navigate to="/" />
+                )
+              } 
+            />
+          </Routes>
+        )}
+      </div>
+    </Router>
   )
 }
 
